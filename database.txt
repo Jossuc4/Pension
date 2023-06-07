@@ -15,3 +15,14 @@ CREATE TABLE TARIF(
 	categorie VARCHAR(50),
 	montant INT
 );
+CREATE TABLE CONJOINT(
+	idConjoint VARCHAR(11) PRIMARY KEY,
+	numPension VARCHAR(10) PRIMARY KEY,
+	nomConjoint VARCHAR(50),
+	prenomConjoint VARCHAR(50),
+	montant INT
+);
+CREATE TABLE PAYER(
+	IM VARCHAR(10) PRIMARY KEY,
+	datePayement DATE PRIMARY KEY
+);
