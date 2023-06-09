@@ -14,6 +14,7 @@ import javax.swing.ButtonGroup;
 import java.awt.Color;
 import java.awt.Font;
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.event.MouseAdapter;
@@ -24,6 +25,9 @@ import javax.swing.BoxLayout;
 import java.awt.FlowLayout;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+
 import java.awt.BorderLayout;
 import javax.swing.JTabbedPane;
 import java.awt.Dimension;
@@ -32,18 +36,62 @@ import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.JScrollPane;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.Cursor;
 
 public class FenetreGestionPension extends JFrame {
 
 	private JPanel contentPane;
-	private JTextField txtCatgorie;
-	private JTextField txtMontant;
-	private JTextField textField;
-	private JTextField textField_1;
+	private JTextField createCateg;
+	private JTextField createMontant;
+	private JTextField tarifMontantModif;
+	private JTextField tarifCatModif;
 	private JTable listeTarifs;
+	private int num_tarif=3;
+	
+	
+	public void print(String param) {
+		System.out.println(param);
+	}
+	/**
+	 * 
+	 * @return Connection
+	 */
+	public Connection connectDB() {
+		Connection cnx=null;
+		DatabaseConnect dbcnx=new DatabaseConnect();
+		try {
+			cnx=dbcnx.connect();
+		}catch(Exception error) {
+			print(error.getMessage());
+		}
+		return cnx;
+	}
+	
+	/**
+	 * 
+	 * @param valeurs
+	 * @param comp
+	 * @return count
+	 */
+	public int occurence(String[]valeurs,String comp) {
+		int count=0;
+		for (String valeur : valeurs) {
+            if (comp.equals(valeur)) {
+                count++;
+            }
+        }
+		return count;
+	}
+	
 
 	/**
 	 * Launch the application.
@@ -103,61 +151,99 @@ public class FenetreGestionPension extends JFrame {
 		formTitleLabel.setBounds(118, 11, 140, 41);
 		panel.add(formTitleLabel);
 		
-		txtCatgorie = new JTextField();
-		txtCatgorie.setText("Catégorie");
-		txtCatgorie.setColumns(10);
-		txtCatgorie.setBounds(34, 131, 300, 20);
-		panel.add(txtCatgorie);
+		createCateg = new JTextField();
+		createCateg.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				createCateg.setText("");
+			}
+			@Override
+			public void focusLost(FocusEvent e) {
+				if(createCateg.getText().isEmpty()) {
+					createCateg.setText("Catégorie");
+				}
+			}
+		});
+		createCateg.setText("Catégorie");
+		createCateg.setColumns(10);
+		createCateg.setBounds(34, 131, 300, 20);
+		panel.add(createCateg);
 		
-		txtMontant = new JTextField();
-		txtMontant.setText("Montant");
-		txtMontant.setColumns(10);
-		txtMontant.setBounds(34, 175, 300, 20);
-		panel.add(txtMontant);
+		createMontant = new JTextField();
+		createMontant.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				createMontant.setText("");
+			}
+			public void focusLost(FocusEvent e) {
+				if(createMontant.getText().isEmpty()) {
+					createMontant.setText("Montant");
+				}
+			}
+		});
+		createMontant.setText("Montant");
+		createMontant.setColumns(10);
+		createMontant.setBounds(34, 175, 300, 20);
+		panel.add(createMontant);
 		
 		JButton btnValidTarif = new JButton("Valider");
+		btnValidTarif.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		
+		
 		btnValidTarif.setBounds(245, 229, 89, 23);
 		panel.add(btnValidTarif);
 		
-		JComboBox comboBox = new JComboBox();
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"M", "N", "O", "P", "I", "J", "K", "L"}));
-		comboBox.setBounds(140, 84, 194, 22);
-		panel.add(comboBox);
+		JComboBox comboCreate = new JComboBox();
+		comboCreate.setBounds(140, 84, 194, 22);
+		panel.add(comboCreate);
 		
 		JLabel comboDiplTarif = new JLabel("Diplôme: ");
 		comboDiplTarif.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		comboDiplTarif.setBounds(34, 84, 83, 22);
 		panel.add(comboDiplTarif);
 		
-		JButton btnValidTarif_1 = new JButton("Valider");
-		btnValidTarif_1.setBounds(245, 479, 89, 23);
-		panel.add(btnValidTarif_1);
+		JButton btnModiftarif = new JButton("Modifier");
+		btnModiftarif.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		
-		textField = new JTextField();
-		textField.setText("Montant");
-		textField.setColumns(10);
-		textField.setBounds(34, 425, 300, 20);
-		panel.add(textField);
+		btnModiftarif.setBounds(245, 479, 89, 23);
+		panel.add(btnModiftarif);
 		
-		textField_1 = new JTextField();
-		textField_1.setText("Catégorie");
-		textField_1.setColumns(10);
-		textField_1.setBounds(34, 381, 300, 20);
-		panel.add(textField_1);
+		tarifMontantModif = new JTextField();
+		tarifMontantModif.setText("Montant");
+		tarifMontantModif.setColumns(10);
+		tarifMontantModif.setBounds(34, 448, 300, 20);
+		panel.add(tarifMontantModif);
 		
-		JComboBox comboBox_1 = new JComboBox();
-		comboBox_1.setBounds(140, 334, 194, 22);
-		panel.add(comboBox_1);
+		tarifCatModif = new JTextField();
+		tarifCatModif.setText("Catégorie");
+		tarifCatModif.setColumns(10);
+		tarifCatModif.setBounds(34, 401, 300, 20);
+		panel.add(tarifCatModif);
+		
+		JComboBox comboModif = new JComboBox();
+		comboModif.setBounds(118, 354, 216, 22);
+		panel.add(comboModif);
 		
 		JLabel comboDiplTarif_1 = new JLabel("Diplôme: ");
 		comboDiplTarif_1.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		comboDiplTarif_1.setBounds(34, 334, 83, 22);
+		comboDiplTarif_1.setBounds(34, 354, 83, 22);
 		panel.add(comboDiplTarif_1);
 		
 		JLabel lblModification = new JLabel("MODIFICATION");
 		lblModification.setFont(new Font("Segoe UI Symbol", Font.BOLD | Font.ITALIC, 25));
 		lblModification.setBounds(86, 279, 204, 41);
 		panel.add(lblModification);
+		
+		JLabel labelNumTarif = new JLabel("Tarif n° : ");
+		labelNumTarif.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		labelNumTarif.setBounds(34, 319, 83, 22);
+		panel.add(labelNumTarif);
+		
+		JLabel numTarif = new JLabel("");
+		numTarif.setFont(new Font("Tahoma", Font.BOLD, 15));
+		numTarif.setBounds(133, 319, 83, 22);
+		panel.add(numTarif);
+		
 		
 		JLabel tarifLabel = new JLabel("GESTION DE TARIFS");
 		tarifLabel.setFont(new Font("Segoe UI Semibold", Font.BOLD | Font.ITALIC, 25));
@@ -166,19 +252,19 @@ public class FenetreGestionPension extends JFrame {
 		Tarif.add(tarifLabel);
 		
 		JPanel ListPanel = new JPanel();
+		ListPanel.setBackground(new Color(255, 255, 255));
 		ListPanel.setBounds(464, 59, 495, 538);
 		Tarif.add(ListPanel);
+		ListPanel.setLayout(new BorderLayout(0, 0));
 		
 		//-----------------Events
 		
 		tabbedPane.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if(tabbedPane.getSelectedIndex()==1) {
-					System.out.println("Tab changed\n");
-					DatabaseConnect cnx=new DatabaseConnect();
 					
 					try {
-						Connection connection=cnx.connect();
+						Connection connection=connectDB();
 						Statement query=connection.createStatement();
 						ResultSet rs=query.executeQuery("SELECT * FROM public.tarif");
 						ResultSetMetaData tarifs=rs.getMetaData();
@@ -190,29 +276,139 @@ public class FenetreGestionPension extends JFrame {
 						
 						for(int i=0;i<columns;i++) {
 							tableHeader[i]=tarifs.getColumnName(i+1);
-							System.out.println(tableHeader[i]);
+							//print(tableHeader[i]);
 						}
 						model.setColumnIdentifiers(tableHeader);
 					
+						//String[]comboModifArray=(String [])comboModif.getSelectedObjects();
+						//String[]comboCreateArray=(String [])comboCreate.getSelectedObjects();
 						
 						while (rs.next()) {
+							//if(occurence(comboModifArray,rs.getString("diplome"))!=0) {
+								comboModif.addItem(rs.getString("diplome"));
+							//}if(occurence(comboCreateArray,rs.getString("diplome"))!=0) {
+								comboCreate.addItem(rs.getString("diplome"));
+							//}
+							
+							
 			                Object[] rowData = new Object[columns];
 			                for (int i = 1; i <= columns; i++) {
 			                    rowData[i - 1] = rs.getObject(i);
 			                }
 			                model.addRow(rowData);
 			            }
+						
+						
 						JTable ListTable=new JTable(model);
+						ListTable.setIntercellSpacing(new Dimension(0,0));
+						
+						ListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+							
+							public void valueChanged(ListSelectionEvent e) {
+				                if (!e.getValueIsAdjusting()) {
+				                    int selectedRow = ListTable.getSelectedRow();
+				                    if (selectedRow != -1) {
+				                        // Do something with the selected row data
+				                    	String[] selectedValue=new String[columns];
+				                    	//print("Selected Row Data: ");
+				                    	for(int i=0;i<columns;i++) {
+											selectedValue[i]=ListTable.getValueAt(selectedRow, i).toString();
+											//print(selectedValue[i]);
+										}
+				                        tarifMontantModif.setText(selectedValue[3]);
+				                        tarifCatModif.setText(selectedValue[2]);
+				                        comboModif.setSelectedItem(selectedValue[1]);
+				                        numTarif.setText(selectedValue[0]);
+				                        
+				                        Icon icon = UIManager.getIcon("OptionPane.deleteIcon");
+				                        JButton btnDeleteTarif = new JButton(icon);
+				                        btnDeleteTarif.setFocusPainted(false);
+				                        btnDeleteTarif.setBackground(Color.white);
+				                        btnDeleteTarif.setBorder(new EmptyBorder(0,0,0,0));
+				                        
+				                		btnDeleteTarif.setBounds(34, 479, 89, 30);
+				                		panel.add(btnDeleteTarif);
+				                    }
+				                }
+				            }
+				        });
+						
 						JScrollPane scrollpane=new JScrollPane(ListTable);
+						scrollpane.setBackground(Color.white);
+						scrollpane.setBorder(new EmptyBorder(0,0,0,0));
 						
 						ListPanel.add(scrollpane);
 					}catch(Exception error) {
-						System.out.println(error);
+						print(error.getMessage());
 					}
 				}
 				
 			}
 			
+		});
+		
+		/**
+		 * Modification d'un tarif
+		 */
+		btnModiftarif.addMouseListener(new MouseAdapter() {
+			
+			public void mouseClicked(MouseEvent e) {
+				try {
+					Connection c=connectDB();
+					PreparedStatement query=c.prepareStatement("UPDATE public.tarif SET diplome=?, categorie=?, montant=? WHERE num_tarif=?");
+					
+					query.setString(1, (String)comboModif.getSelectedItem());
+					query.setString(2, tarifCatModif.getText());
+					query.setInt(3,Integer.parseInt(tarifMontantModif.getText()));
+					query.setString(4, numTarif.getText());
+					
+					int rowsAffected=query.executeUpdate();
+					
+					if(rowsAffected==1) {
+						print("Modification réussie");
+						tabbedPane.repaint();
+						
+					}
+				}catch(SQLException error) {
+					print(error.getMessage());
+				}
+				
+			}
+		});
+		
+		
+		/**
+		 * Création d'un tarif
+		 */
+		
+		btnValidTarif.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				String diplome=(String)comboCreate.getSelectedItem(),categ=createCateg.getText(),montant = createMontant.getText();
+				
+				if((!categ.equals("Catégorie") && !categ.isEmpty()) && (!montant.equals("Catégorie") && !montant.isEmpty())) {
+					try {
+						Connection c=connectDB();
+						PreparedStatement query=c.prepareStatement("INSERT INTO  public.tarif VALUES(?,?,?,?)");
+						
+						
+						query.setString(1,"T"+num_tarif);
+						query.setString(2, diplome);
+						query.setString(3, categ);
+						query.setInt(4,Integer.parseInt(montant));
+						
+						num_tarif++;
+						
+						int rowsAffected=query.executeUpdate();
+						
+						if(rowsAffected==1) {
+							print("Insertion réussie");
+						}
+					}catch(SQLException error) {
+						print(error.getMessage());
+					}
+				}
+				
+			}
 		});
 	}
 }

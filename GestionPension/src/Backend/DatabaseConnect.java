@@ -6,6 +6,7 @@ public class DatabaseConnect {
 	private final String url="jdbc:postgresql://localhost/gestionpension";
 	private final String user="postgres";
 	private final String password="admin";
+	public static int num_tarif=0;
 	
 	public Connection connect() {
 		Connection connect=null;
@@ -23,4 +24,7 @@ public class DatabaseConnect {
 		return connect;
 	}
 	
+	public static int newTarif() {
+		return num_tarif;
+	}
 }
