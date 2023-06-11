@@ -3,6 +3,7 @@ package mainPackage;
 import java.awt.EventQueue;
 import java.sql.*;
 import Backend.DatabaseConnect;
+import Backend.idGenerator;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -14,6 +15,7 @@ import javax.swing.ButtonGroup;
 import java.awt.Color;
 import java.awt.Font;
 import javax.swing.JTree;
+import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -21,6 +23,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JTable;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.BoxLayout;
 import java.awt.FlowLayout;
 import javax.swing.GroupLayout;
@@ -46,6 +49,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.Cursor;
+import javax.swing.JEditorPane;
 
 public class FenetreGestionPension extends JFrame {
 
@@ -55,8 +59,7 @@ public class FenetreGestionPension extends JFrame {
 	private JTextField tarifMontantModif;
 	private JTextField tarifCatModif;
 	private JTable listeTarifs;
-	private int num_tarif=3;
-	
+
 	
 	public void print(String param) {
 		System.out.println(param);
@@ -108,7 +111,50 @@ public class FenetreGestionPension extends JFrame {
 			}
 		});
 	}
+	/**
+	 * Return true  if the value is fund in the table
+	 * @param table
+	 * @param value
+	 * @return found
+	 */
+	public boolean includedValue(String[]table,String value) {
+		boolean found=false;
+		if(table.length>0) {
+			for (String i : table) {
+				if(!(i==null) && i.equals(value)) {
+					found=true;
+				}
+			}
+		}
+		return found;
+	}
 
+	/**
+	 * Vérification de valeur pour éviter les tarifs de même diplome après modifcation
+	 * @param model
+	 * @param selectedRow
+	 * @param newComboValue
+	 * @return boolean found
+	 */
+	public boolean sameRowValue(DefaultTableModel model,int selectedRow,Object newComboValue) {
+		boolean found=false;
+		String cible=(String)newComboValue;
+		
+		for(int i=0;i<model.getRowCount();i++) {
+			
+			if(i!=selectedRow) {
+				print("test n°"+i);
+				String valeur=(String)model.getValueAt(i, 1);
+				if(cible.equals(valeur)) {
+					print(cible +" and "+valeur);
+					found=true;
+				}
+			}
+			
+			
+		}
+		return found;
+	}
 	/**
 	 * Create the frame.
 	 */
@@ -125,6 +171,7 @@ public class FenetreGestionPension extends JFrame {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.setBackground(new Color(25, 164, 90));
 		
 		contentPane.add(tabbedPane);
 		
@@ -136,7 +183,7 @@ public class FenetreGestionPension extends JFrame {
 		Tarif.setName("");
 		Tarif.setPreferredSize(new Dimension(1000, 500));
 		Tarif.setMinimumSize(new Dimension(20, 10));
-		Tarif.setBackground(new Color(255, 255, 255));
+		Tarif.setBackground(Color.WHITE);
 		tabbedPane.addTab("Tarif", null, Tarif, null);
 		Tarif.setLayout(null);
 		
@@ -155,7 +202,8 @@ public class FenetreGestionPension extends JFrame {
 		createCateg.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				createCateg.setText("");
+				if(createCateg.getText().equals("Catégorie"))
+					createCateg.setText("");
 			}
 			@Override
 			public void focusLost(FocusEvent e) {
@@ -173,7 +221,8 @@ public class FenetreGestionPension extends JFrame {
 		createMontant.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				createMontant.setText("");
+				if(createMontant.getText().equals("Montant"))
+					createMontant.setText("");
 			}
 			public void focusLost(FocusEvent e) {
 				if(createMontant.getText().isEmpty()) {
@@ -194,6 +243,8 @@ public class FenetreGestionPension extends JFrame {
 		panel.add(btnValidTarif);
 		
 		JComboBox comboCreate = new JComboBox();
+		
+		comboCreate.setModel(new DefaultComboBoxModel(new String[] {"CEPE", "BEPC", "BACCALAUREAT", "LICENCE", "MASTER", "DOCTORAT"}));
 		comboCreate.setBounds(140, 84, 194, 22);
 		panel.add(comboCreate);
 		
@@ -221,6 +272,7 @@ public class FenetreGestionPension extends JFrame {
 		panel.add(tarifCatModif);
 		
 		JComboBox comboModif = new JComboBox();
+		comboModif.setModel(new DefaultComboBoxModel(new String[] {"CEPE", "BEPC", "BACCALAUREAT", "LICENCE", "MASTER", "DOCTORAT"}));
 		comboModif.setBounds(118, 354, 216, 22);
 		panel.add(comboModif);
 		
@@ -244,6 +296,12 @@ public class FenetreGestionPension extends JFrame {
 		numTarif.setBounds(133, 319, 83, 22);
 		panel.add(numTarif);
 		
+		JButton btnDeleteTarif = new JButton("Supprimer");
+		btnDeleteTarif.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		
+		btnDeleteTarif.setBounds(34, 479, 101, 23);
+		panel.add(btnDeleteTarif);
+		
 		
 		JLabel tarifLabel = new JLabel("GESTION DE TARIFS");
 		tarifLabel.setFont(new Font("Segoe UI Semibold", Font.BOLD | Font.ITALIC, 25));
@@ -260,155 +318,284 @@ public class FenetreGestionPension extends JFrame {
 		//-----------------Events
 		
 		tabbedPane.addChangeListener(new ChangeListener() {
+			
+			private int comboModifChanged=0;
+			private boolean firstChange=false;
 			public void stateChanged(ChangeEvent e) {
-				if(tabbedPane.getSelectedIndex()==1) {
+				
+				if(!firstChange) {
 					
-					try {
-						Connection connection=connectDB();
-						Statement query=connection.createStatement();
-						ResultSet rs=query.executeQuery("SELECT * FROM public.tarif");
-						ResultSetMetaData tarifs=rs.getMetaData();
-						
-						int columns=tarifs.getColumnCount();
-						String [] tableHeader=new String[columns];
-						
-						DefaultTableModel model=new DefaultTableModel();
-						
-						for(int i=0;i<columns;i++) {
-							tableHeader[i]=tarifs.getColumnName(i+1);
-							//print(tableHeader[i]);
-						}
-						model.setColumnIdentifiers(tableHeader);
+					firstChange=true;
 					
-						//String[]comboModifArray=(String [])comboModif.getSelectedObjects();
-						//String[]comboCreateArray=(String [])comboCreate.getSelectedObjects();
+					if(tabbedPane.getSelectedIndex()==1) {
 						
-						while (rs.next()) {
-							//if(occurence(comboModifArray,rs.getString("diplome"))!=0) {
-								comboModif.addItem(rs.getString("diplome"));
-							//}if(occurence(comboCreateArray,rs.getString("diplome"))!=0) {
-								comboCreate.addItem(rs.getString("diplome"));
-							//}
+						try {
+							print("ligne 306\nJ'ai commenté la collecte des diplomes déjà crées");
 							
+							Connection connection=connectDB();
+							Statement query=connection.createStatement();
+							ResultSet rs=query.executeQuery("SELECT * FROM public.tarif");
+							ResultSetMetaData tarifs=rs.getMetaData();
 							
-			                Object[] rowData = new Object[columns];
-			                for (int i = 1; i <= columns; i++) {
-			                    rowData[i - 1] = rs.getObject(i);
-			                }
-			                model.addRow(rowData);
-			            }
-						
-						
-						JTable ListTable=new JTable(model);
-						ListTable.setIntercellSpacing(new Dimension(0,0));
-						
-						ListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+							int columns=tarifs.getColumnCount();
 							
-							public void valueChanged(ListSelectionEvent e) {
-				                if (!e.getValueIsAdjusting()) {
-				                    int selectedRow = ListTable.getSelectedRow();
-				                    if (selectedRow != -1) {
-				                        // Do something with the selected row data
-				                    	String[] selectedValue=new String[columns];
-				                    	//print("Selected Row Data: ");
-				                    	for(int i=0;i<columns;i++) {
-											selectedValue[i]=ListTable.getValueAt(selectedRow, i).toString();
-											//print(selectedValue[i]);
-										}
-				                        tarifMontantModif.setText(selectedValue[3]);
-				                        tarifCatModif.setText(selectedValue[2]);
-				                        comboModif.setSelectedItem(selectedValue[1]);
-				                        numTarif.setText(selectedValue[0]);
-				                        
-				                        Icon icon = UIManager.getIcon("OptionPane.deleteIcon");
-				                        JButton btnDeleteTarif = new JButton(icon);
-				                        btnDeleteTarif.setFocusPainted(false);
-				                        btnDeleteTarif.setBackground(Color.white);
-				                        btnDeleteTarif.setBorder(new EmptyBorder(0,0,0,0));
-				                        
-				                		btnDeleteTarif.setBounds(34, 479, 89, 30);
-				                		panel.add(btnDeleteTarif);
-				                    }
+							String [] tableHeader=new String[columns];
+							
+							DefaultTableModel model=new DefaultTableModel();
+							
+							int lignes=model.getRowCount();
+							print(String.valueOf(lignes));
+							
+							for(int i=0;i<columns;i++) {
+								tableHeader[i]=tarifs.getColumnName(i+1);
+							}
+							model.setColumnIdentifiers(tableHeader);
+							
+							/**
+							 * Collecte des diplomes déjà crées
+							 * 
+							 */
+						
+							while (rs.next()) {
+				                Object[] rowData = new Object[columns];
+				                for (int i = 1; i <= columns; i++) {
+				                    rowData[i - 1] = rs.getObject(i);
 				                }
+				                model.addRow(rowData);
+				               
 				            }
-				        });
+							
+							JTable ListTable=new JTable(model);
+							ListTable.setIntercellSpacing(new Dimension(0,0));
+							ListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+							ListTable.setDefaultEditor(Object.class, null);
+							Cursor pointerCursor = new Cursor(Cursor.HAND_CURSOR);
+							ListTable.setCursor(pointerCursor);
+							
+				print("new code line 357");
+				print("creation createdDipl");
 						
-						JScrollPane scrollpane=new JScrollPane(ListTable);
-						scrollpane.setBackground(Color.white);
-						scrollpane.setBorder(new EmptyBorder(0,0,0,0));
-						
-						ListPanel.add(scrollpane);
-					}catch(Exception error) {
-						print(error.getMessage());
-					}
-				}
-				
-			}
-			
-		});
+							int rowCount = model.getRowCount();
+							
+							String[] createdDipl=new String[rowCount+1];
+							
+							print("Nbre de lignes: "+rowCount);
+							for (int row = 0; row < rowCount; row++) {
+						        Object value = model.getValueAt(row, 1);
+						        createdDipl[row]=(String)value;
+						        System.out.println("Valeur à la position : " + value);
+							}
+							
+							ListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+								
+								public void valueChanged(ListSelectionEvent e) {
+									print("ligne 367");
+					                if (!e.getValueIsAdjusting()) {
+					                	
+					                    int selectedRow = ListTable.getSelectedRow();
+					                    
+					                    if (selectedRow != -1) {
+
+					                    	String[] selectedValue=new String[columns];
+
+					                    	for(int i=0;i<columns;i++) {
+					                    		
+												selectedValue[i]=ListTable.getValueAt(selectedRow, i).toString();
+
+											}
+					                    	
+					                        tarifMontantModif.setText(selectedValue[3]);
+					                        tarifCatModif.setText(selectedValue[2]);
+					                        comboModif.setSelectedItem(selectedValue[1]);
+					                        numTarif.setText(selectedValue[0]);
+					                      
+					                    }
+					                }
+					            }
+					        });
+							
+							JScrollPane scrollpane=new JScrollPane(ListTable);
+							scrollpane.setBackground(Color.white);
+							scrollpane.setBorder(new EmptyBorder(0,0,0,0));
+							
+							ListPanel.add(scrollpane);
+							
+							/**
+							 * Création d'un tarif
+							 */
+							
+							btnValidTarif.addMouseListener(new MouseAdapter() {
+								public void mouseClicked(MouseEvent e) {
+									String diplome=(String)comboCreate.getSelectedItem(),categ=createCateg.getText(),montant = createMontant.getText();
+									
+									if((!categ.equals("Catégorie") && !categ.isEmpty()) && (!montant.equals("Catégorie") && !montant.isEmpty())) {
+										
+								if(!includedValue(createdDipl,diplome)) {
+											
+											try {
+												
+												Connection c=connectDB();
+												PreparedStatement query=c.prepareStatement("INSERT INTO  public.tarif VALUES(?,?,?,?)");
+												
+												idGenerator id=new idGenerator();
+												String newTarifId=id.newTarifId();
+												
+												query.setString(1,newTarifId);
+												query.setString(2, diplome);
+												query.setString(3, categ);
+												query.setInt(4,Integer.parseInt(montant));
 		
-		/**
-		 * Modification d'un tarif
-		 */
-		btnModiftarif.addMouseListener(new MouseAdapter() {
-			
-			public void mouseClicked(MouseEvent e) {
-				try {
-					Connection c=connectDB();
-					PreparedStatement query=c.prepareStatement("UPDATE public.tarif SET diplome=?, categorie=?, montant=? WHERE num_tarif=?");
-					
-					query.setString(1, (String)comboModif.getSelectedItem());
-					query.setString(2, tarifCatModif.getText());
-					query.setInt(3,Integer.parseInt(tarifMontantModif.getText()));
-					query.setString(4, numTarif.getText());
-					
-					int rowsAffected=query.executeUpdate();
-					
-					if(rowsAffected==1) {
-						print("Modification réussie");
-						tabbedPane.repaint();
+												
+												int rowsAffected=query.executeUpdate();
+												
+												if(rowsAffected==1) {
+													model.addRow(new Object[]{newTarifId, diplome, categ,Integer.parseInt(montant)});
+													JOptionPane.showMessageDialog(new JLabel("label"),"Insertion réussie");
+													createCateg.setText("Catégorie");
+													createMontant.setText("Montant");
+												}
+											}catch(SQLException error) {
+												print(error.getMessage());
+											}
+										}else {
+											JOptionPane.showMessageDialog(ListPanel,"Le tarif pour le diplome "+diplome+" existe déjà\nVous pouvez le modifier en le cliquant");
+										}
+									}
+									
+								}
+							});
+							/**
+							 * Modification d'un tarif
+							 */
 						
-					}
-				}catch(SQLException error) {
-					print(error.getMessage());
-				}
-				
-			}
-		});
-		
-		
-		/**
-		 * Création d'un tarif
-		 */
-		
-		btnValidTarif.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				String diplome=(String)comboCreate.getSelectedItem(),categ=createCateg.getText(),montant = createMontant.getText();
-				
-				if((!categ.equals("Catégorie") && !categ.isEmpty()) && (!montant.equals("Catégorie") && !montant.isEmpty())) {
-					try {
-						Connection c=connectDB();
-						PreparedStatement query=c.prepareStatement("INSERT INTO  public.tarif VALUES(?,?,?,?)");
-						
-						
-						query.setString(1,"T"+num_tarif);
-						query.setString(2, diplome);
-						query.setString(3, categ);
-						query.setInt(4,Integer.parseInt(montant));
-						
-						num_tarif++;
-						
-						int rowsAffected=query.executeUpdate();
-						
-						if(rowsAffected==1) {
-							print("Insertion réussie");
+							
+							btnModiftarif.addMouseListener(new MouseAdapter() {
+								
+								public void mouseClicked(MouseEvent e) {
+									
+									UIManager.put("OptionPane.yesButtonText", "Oui");
+							        UIManager.put("OptionPane.noButtonText", "Non");
+							        
+							        Object modifDipl=comboModif.getSelectedItem();
+							        
+							        if(!sameRowValue(model,ListTable.getSelectedRow(),modifDipl)) {
+							        	
+							        
+										int choice = JOptionPane.showConfirmDialog(null, "Voulez-vous modifier ce tarif ?", "Modification d'un tarif", JOptionPane.YES_NO_OPTION);
+										
+								        if (choice == JOptionPane.YES_OPTION) {
+											String diplModif="",tarifModif="",numTarModif="";
+											int montantModif=0;
+											if(!tarifCatModif.getText().equals("Catégorie") && !tarifMontantModif.getText().equals("Montant")) {
+												 diplModif=(String)comboModif.getSelectedItem();
+												 tarifModif=tarifCatModif.getText();
+												 montantModif=Integer.parseInt(tarifMontantModif.getText());
+												 numTarModif=numTarif.getText();
+											}else {
+												JOptionPane.showMessageDialog(ListPanel,"Vous devez choisir le tarif sur la table");
+											}
+												
+											try {
+												Connection c=connectDB();
+												PreparedStatement query=c.prepareStatement("UPDATE public.tarif SET diplome=?, categorie=?, montant=? WHERE num_tarif=?");
+												
+												query.setString(1, diplModif);
+												query.setString(2, tarifModif);
+												query.setInt(3,montantModif);
+												query.setString(4, numTarModif);
+												
+												int rowsAffected=query.executeUpdate();
+												
+												if(rowsAffected==1) {
+													
+													model.setValueAt(diplModif,ListTable.getSelectedRow(),1);
+													model.setValueAt(tarifModif,ListTable.getSelectedRow(),2);
+													model.setValueAt(montantModif,ListTable.getSelectedRow(),3);
+													
+													JOptionPane.showMessageDialog(ListPanel,"Modification réussie");
+													
+													tarifCatModif.setText("Catégorie");
+													tarifMontantModif.setText("Montant");
+													numTarif.setText("");
+													ListTable.clearSelection();
+													
+												}
+											}catch(SQLException error) {
+												print(error.getMessage());
+											}
+											
+										}
+							        }else {
+							        	JOptionPane.showMessageDialog(ListPanel, "Le tarif pour le diplome "+modifDipl+" existe déjà");
+							        }
+							    }
+							});
+							
+							/**
+							 * Suppression d'un tarif
+							 */
+							btnDeleteTarif.addMouseListener(new MouseAdapter() {
+								
+								public void mouseClicked(MouseEvent e) {
+									
+									UIManager.put("OptionPane.yesButtonText", "Oui");
+							        UIManager.put("OptionPane.noButtonText", "Non");
+							        
+							        int choice = JOptionPane.showConfirmDialog(null, "Voulez-vous modifier ce tarif ?", "Modification d'un tarif", JOptionPane.YES_NO_OPTION);
+									
+							        if (choice == JOptionPane.YES_OPTION) {
+							        	
+										String numTarModif="";
+										
+										if(!tarifCatModif.getText().equals("Catégorie") && !tarifMontantModif.getText().equals("Montant")) {
+											 numTarModif=numTarif.getText();
+											 
+										}else {
+											
+											JOptionPane.showMessageDialog(new JLabel("label"),"Vous devez choisir le tarif sur la table");
+										
+										}
+										try {
+											Connection cnx=connectDB();
+											PreparedStatement query= cnx.prepareStatement("DELETE FROM public.tarif WHERE num_tarif=?");
+											
+											query.setString(1, numTarModif);
+											
+											int rowsAffected=query.executeUpdate();
+											
+											if(rowsAffected==1) {
+												model.removeRow(ListTable.getSelectedRow());
+												JOptionPane.showMessageDialog(ListPanel, "Suppression réussie");
+												
+												tarifCatModif.setText("Catégorie");
+												tarifMontantModif.setText("Montant");
+												numTarif.setText("");
+												
+											}
+										}catch(Exception error) {
+											print(error.getMessage());
+										}
+										
+							        }
+
+									
+								}
+								
+							});
+						}catch(Exception error) {
+							print("C'est ici que ça se passe");
+							print(error.getMessage());
+							for (StackTraceElement element : error.getStackTrace()) {
+						        print(element.toString() + "\n");
+						    }
+							
 						}
-					}catch(SQLException error) {
-						print(error.getMessage());
 					}
 				}
 				
 			}
+			
 		});
+		
 	}
 }
