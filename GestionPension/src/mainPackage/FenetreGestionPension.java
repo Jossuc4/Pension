@@ -41,8 +41,11 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.Cursor;
 import javax.swing.JCheckBox;
+<<<<<<< HEAD
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+=======
+>>>>>>> 6c0e3d864ac8d97c103a1f1f7a81519da739297a
 
 public class FenetreGestionPension extends JFrame {
 
@@ -176,7 +179,11 @@ public class FenetreGestionPension extends JFrame {
 		setTitle("Pension pour tous");
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+<<<<<<< HEAD
 		setBounds(200, 30, 1020, 696);
+=======
+		setBounds(200, 30, 1020, 700);
+>>>>>>> 6c0e3d864ac8d97c103a1f1f7a81519da739297a
 		contentPane = new JPanel();
 		contentPane.setBackground(new Color(25, 164, 90));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -185,20 +192,32 @@ public class FenetreGestionPension extends JFrame {
 		contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.X_AXIS));
 		
 		final JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+<<<<<<< HEAD
 		tabbedPane.setFocusCycleRoot(true);
+=======
+>>>>>>> 6c0e3d864ac8d97c103a1f1f7a81519da739297a
 		tabbedPane.setBackground(new Color(25, 164, 90));
 		
 		contentPane.add(tabbedPane);
 		
+<<<<<<< HEAD
 		JPanel HomePanel = new JPanel();
 		tabbedPane.addTab("Accueil", null, HomePanel, null);
+=======
+		JPanel panel_2 = new JPanel();
+		tabbedPane.addTab("Acceuil", null, panel_2, null);
+>>>>>>> 6c0e3d864ac8d97c103a1f1f7a81519da739297a
 		
 		JPanel Tarif = new JPanel();
 		Tarif.setToolTipText("");
 		Tarif.setName("");
 		Tarif.setPreferredSize(new Dimension(1000, 500));
 		Tarif.setMinimumSize(new Dimension(20, 10));
+<<<<<<< HEAD
 		Tarif.setBackground(new Color(25, 164, 90));
+=======
+		Tarif.setBackground(Color.WHITE);
+>>>>>>> 6c0e3d864ac8d97c103a1f1f7a81519da739297a
 		tabbedPane.addTab("Tarif", null, Tarif, null);
 		Tarif.setLayout(null);
 		
@@ -358,10 +377,17 @@ public class FenetreGestionPension extends JFrame {
 		panel.add(chckNewDipl);
 		
 		
+<<<<<<< HEAD
 		JLabel tarifLabel = new JLabel("GESTION DES TARIFS");
 		tarifLabel.setFont(new Font("Dialog", Font.PLAIN, 25));
 		tarifLabel.setForeground(new Color(0, 0, 0));
 		tarifLabel.setBounds(433, 11, 280, 41);
+=======
+		JLabel tarifLabel = new JLabel("GESTION DE TARIFS");
+		tarifLabel.setFont(new Font("Dialog", Font.PLAIN, 25));
+		tarifLabel.setForeground(new Color(0, 0, 0));
+		tarifLabel.setBounds(433, 11, 250, 41);
+>>>>>>> 6c0e3d864ac8d97c103a1f1f7a81519da739297a
 		Tarif.add(tarifLabel);
 		
 		final JPanel ListPanel = new JPanel();
@@ -371,11 +397,14 @@ public class FenetreGestionPension extends JFrame {
 		Tarif.add(ListPanel);
 		ListPanel.setLayout(new BorderLayout(0, 0));
 		
+<<<<<<< HEAD
 		
 		print("ligne 376: ajout de le fenêtre GestionPersonnes");
 		GestionPersonnes gprs=new GestionPersonnes();
 		tabbedPane.addTab("Personnes", null, gprs, null);
 		
+=======
+>>>>>>> 6c0e3d864ac8d97c103a1f1f7a81519da739297a
 		//-----------------Events
 		
 		tabbedPane.addChangeListener(new ChangeListener() {
@@ -388,7 +417,11 @@ public class FenetreGestionPension extends JFrame {
 					firstChange=true;
 					
 					if(tabbedPane.getSelectedIndex()==1) {
+<<<<<<< HEAD
 						print("Voilà");
+=======
+						
+>>>>>>> 6c0e3d864ac8d97c103a1f1f7a81519da739297a
 						try {
 							print("ligne 306\nJ'ai commenté la collecte des diplomes déjà crées");
 							
@@ -617,7 +650,11 @@ public class FenetreGestionPension extends JFrame {
 									UIManager.put("OptionPane.yesButtonText", "Oui");
 							        UIManager.put("OptionPane.noButtonText", "Non");
 							        
+<<<<<<< HEAD
 							        int choice = JOptionPane.showConfirmDialog(null, "Voulez-vous supprimer ce tarif ?", "Suppression d'un tarif", JOptionPane.YES_NO_OPTION);
+=======
+							        int choice = JOptionPane.showConfirmDialog(null, "Voulez-vous modifier ce tarif ?", "Modification d'un tarif", JOptionPane.YES_NO_OPTION);
+>>>>>>> 6c0e3d864ac8d97c103a1f1f7a81519da739297a
 									
 							        if (choice == JOptionPane.YES_OPTION) {
 							        	

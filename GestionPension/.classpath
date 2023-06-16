@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk-20">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Larry Jossuca/Downloads/Compressed/jar_files/postgresql-42.6.0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="lib" path="miglayout15-swing.jar" sourcepath="miglayout-src.zip"/>
+<<<<<<< HEAD
 	<classpathentry kind="lib" path="jcalendar-1.4.jar"/>
 	<classpathentry kind="lib" path="jgoodies-looks-2.4.1.jar"/>
 	<classpathentry kind="lib" path="jgoodies-common-1.2.0.jar"/>
+=======
+	<classpathentry kind="lib" path="/media/tsilavo/Disque local1/ENI/ECLIPSE/postgresql-42.6.0.jar"/>
+>>>>>>> 6c0e3d864ac8d97c103a1f1f7a81519da739297a
 	<classpathentry kind="output" path="bin"/>
 </classpath>

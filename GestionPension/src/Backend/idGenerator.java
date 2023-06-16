@@ -48,7 +48,12 @@ public class idGenerator {
 		
 		editFile("fichierTarif.txt",numero);
 		
+<<<<<<< HEAD
 		return "T"+numero/100+""+numero/10+""+numero%10;
 	}
 	
+=======
+		return "T"+numero/100+""+numero/10+""+numero;
+	}
+>>>>>>> 6c0e3d864ac8d97c103a1f1f7a81519da739297a
 }
