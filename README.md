@@ -1,4 +1,4 @@
-# GestionPension
+# Gestion de Pension
 
 It is an application for managing the payment of a pension to retired people
 
